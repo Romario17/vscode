@@ -1,0 +1,13 @@
+#ifndef STR_LIMITS_H
+#define STR_LIMITS_H
+
+#define USHRT_NDIGITS 5
+
+#define STR_INT32_MIN "-2147483648"
+#define STR_INT32_MAX "2147483647"
+#define STR_UINT32_MAX "4294967295"
+#define STR_SHRT_MIN "-32768" 
+#define STR_SHRT_MAX "32767"
+#define STR_USHORT_MAX "65535"
+
+#endif /* STR_LIMITS_H */
