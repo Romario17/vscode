@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <math.h>
+#include <stdlib.h>
 #include "../include/avl.h"
+#include "../include/stack.h"
 
 struct avl_node
 {
@@ -193,7 +194,7 @@ bool avl_insert(AVL_Tree *avl_tree, int key, void *data)
     if (successful_insertion)
     {
         AVL_Node **balancing_node = ptr_father;
-        while (*balancing_node != NULL)
+        while (balancing_node != NULL)
         {
             if (balancing_factor(balancing_node) >= 2)
                 if (height((*balancing_node)->left_child) > height((*balancing_node)->right_child))
@@ -282,7 +283,7 @@ bool avl_remove(AVL_Tree *avl_tree, int key)
     if (successful_removal)
     {
         AVL_Node **balancing_node = ptr_father;
-        while (*balancing_node != NULL)
+        while (balancing_node != NULL)
         {
             if (balancing_factor(balancing_node) >= 2)
                 if (height((*balancing_node)->left_child) > height((*balancing_node)->right_child))
@@ -313,6 +314,27 @@ void print(AVL_Node *avl_node, int height)
         printf("%*d\n", height * 5, avl_node->key);
         print(avl_node->left_child, height + 1);
     }
+}
+
+void iterative_print(AVL_Node* avl_node)
+{
+    if(avl_node == NULL)
+        return;
+    int height_max = avl_node->height;
+    Stack* stack = stack_create();
+    stack_insert(stack, avl_node);
+    while(stack_size(stack) > 0) {
+        while(avl_node->right_child != NULL)
+            stack_insert(stack, avl_node->right_child);
+        avl_node = (AVL_Node*) stack_remove(stack);
+        printf("%*d\n", (height_max - avl_node->height) * 5, avl_node->key);
+        if(avl_node->left_child != NULL)
+        {
+            stack_insert(stack, avl_node->left_child);
+            avl_node = avl_node->left_child;
+        }
+    }
+    stack_destroy(stack);
 }
 
 void avl_print(AVL_Tree *avl_tree)
