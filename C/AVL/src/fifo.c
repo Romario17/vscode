@@ -16,15 +16,15 @@ struct fifo
     int size;
 };
 
-FIFO *fifo_create()
+Fifo *fifo_create()
 {
-    FIFO *fifo = (FIFO *)malloc(sizeof(FIFO));
+    Fifo *fifo = (Fifo *)malloc(sizeof(Fifo));
     fifo->first = fifo->last = NULL;
     fifo->size = 0;
     return fifo;
 }
 
-bool fifo_enqueue(FIFO *fifo, void *addr)
+bool fifo_enqueue(Fifo *fifo, void *addr)
 {
     if (fifo == NULL)
         return false;
@@ -42,7 +42,7 @@ bool fifo_enqueue(FIFO *fifo, void *addr)
     return true;
 }
 
-bool fifo_dequeue(FIFO *fifo, void **receiver)
+bool fifo_dequeue(Fifo *fifo, void **receiver)
 {
     if (fifo == NULL)
         return false;
@@ -58,12 +58,12 @@ bool fifo_dequeue(FIFO *fifo, void **receiver)
     return true;
 }
 
-int fifo_size(FIFO *fifo)
+int fifo_size(Fifo *fifo)
 {
     return fifo->size;
 }
 
-void fifo_destroy(FIFO *fifo)
+void fifo_destroy(Fifo *fifo)
 {
     if (fifo != NULL)
     {
