@@ -4,6 +4,12 @@
 #include "../include/dlinked_list.h"
 #include "../include/la_graph.h"
 
+typedef struct state
+{
+    int c;
+    int m;
+} State;
+
 /**
  * @param c -> cannibals number
  * @param m -> missionaries number
@@ -11,9 +17,22 @@
  * 
  * @return bolean value
  */
-bool validateState(int c, int m, int max_members_per_group)
+bool validateState(State s, int max_members_per_group)
 {
-    if (m == 0 || m == c || m == max_members_per_group)
+    if (s.m == 0 || s.m == s.c || s.m == max_members_per_group)
+        return true;
+    return false;
+}
+
+/**
+ * @param c1 and c2 -> number of missionaries and cannibals of the left bank before the crossing
+ * @param m1 and m2 -> number of missionaries and cannibals of the left bank after the crossing
+ * 
+ * @return bolean value
+ */
+bool extrapoledBoatCapacity(State s1, State s2, int max_boat_capacity)
+{
+    if(((s1.c + s1.m) - (s2.c + s2.m)) >= 1 && ((s1.c + s1.m) - (s2.c + s2.m)) <= max_boat_capacity)
         return true;
     return false;
 }
@@ -27,33 +46,34 @@ bool validateState(int c, int m, int max_members_per_group)
 LA_Graph *problemOfCannibalsAndMissionaries(int max_members_per_group, int max_boat_capacity)
 {
     LA_Graph *graph = laGraph_create((max_members_per_group + 1) * (max_members_per_group + 1));
-    int c1, m1; // number of missionaries and cannibals of the left bank before the crossing
-    int c2, m2; // number of missionaries and cannibals of the left bank after the crossing
-    //int s1, s2;                 // state before crossing and state after crossing
-    int c2_inf_lim, m2_inf_lim; // inferior limit
+    State s1; // state of the left bank before crossing
+    State s2; // state of the left bank after crossing
 
-    for (c1 = 0; c1 <= max_members_per_group; c1++)
-        for (m1 = 0; m1 <= max_members_per_group; m1++)
+    for (s1.c = 0; s1.c <= max_members_per_group; s1.c++)
+        for (s1.m = 0; s1.m <= max_members_per_group; s1.m++)
         {
-            if (validateState(c1, m1, max_members_per_group))
+            if (validateState(s1, max_members_per_group))
             {
-                c2_inf_lim = (c1 > max_boat_capacity) ? (c1 - max_boat_capacity) : 0;
-                m2_inf_lim = (m1 > max_boat_capacity) ? (m1 - max_boat_capacity) : 0;
+                int c2_inf_lim = (s1.c > max_boat_capacity) ? (s1.c - max_boat_capacity) : 0;
+                int m2_inf_lim = (s1.m > max_boat_capacity) ? (s1.m - max_boat_capacity) : 0;
                 bool is_first = true;
 
-                printf("[%d, %d] -- adjacency list = {", c1, m1);
-                for (c2 = c2_inf_lim; c2 <= c1; c2++)
-                    for (m2 = m2_inf_lim; m2 <= m1; m2++)
-                        if (validateState(c2, m2, max_members_per_group))
-                            if (((c1 + m1) - (c2 + m2)) >= 1 && ((c1 + m1) - (c2 + m2)) <= max_boat_capacity)
+                //printf("[%d, %d] -- adjacency list = {", s1.c, s1.m);
+                for (s2.c = c2_inf_lim; s2.c <= s1.c; s2.c++)
+                    for (s2.m = m2_inf_lim; s2.m <= s1.m; s2.m++)
+                        if (validateState(s2, max_members_per_group))
+                            if (extrapoledBoatCapacity(s1, s2, max_boat_capacity))
                             {
-                                if (is_first == true)
+                                int id_orig = (s1.c * (max_members_per_group + 1)) + s1.m;
+                                int id_dest = (s2.c * (max_members_per_group + 1)) + s2.m;
+                                laGraph_insertEdge(graph, id_orig, id_dest);
+                                /*if (is_first == true)
                                     is_first = false;
                                 else
                                     printf(" -> ");
-                                printf("[%d, %d]", c2, m2);
+                                printf("[%d, %d]", s2.c, s2.m);*/
                             }
-                printf("}\n");
+                //printf("}\n");
             }
         }
     return graph;
@@ -63,6 +83,7 @@ int main()
 {
     printf("###### GRAPH WITH THE LEFT MARGIN STATES ######\n\n");
     LA_Graph *graph = problemOfCannibalsAndMissionaries(3, 2);
+    laGraph_print(graph);
     laGraph_destroy(graph, false);
     return 0;
 }
