@@ -16,11 +16,13 @@ DEBUG_FLAG=-g
 
 RELEASE_FLAG=-o
 
+ARCHITECTURE_FLAG=-m32
+
 CC_FLAGS=-c			\
 		 -W         \
          -Wall
 
-RM=del
+RM=rm
 
 all: $(PROJ_PATH)
 
@@ -35,7 +37,7 @@ projectfolders:
 
 .PHONY: clean mrproper
 clean:
-	@ $(RM) obj\*.o
+	@ $(RM) obj/*.o
 
 mrproper: clean
-	@ $(RM) debug\$(PROJ_NAME).exe
+	@ $(RM) debug/$(PROJ_NAME)
